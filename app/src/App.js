@@ -1,5 +1,9 @@
 import ApolloClient, { createNetworkInterface } from 'apollo-client';
 import { ApolloProvider } from 'react-apollo';
+import gql from 'graphql-tag';
+import { graphql } from 'react-apollo';
+import React, { Component } from 'react';
+import './App.css';
 
 const client = new ApolloClient({
   networkInterface: createNetworkInterface({
@@ -8,103 +12,59 @@ const client = new ApolloClient({
   connectToDevTools: true,
 });
 
-import gql from 'graphql-tag';
-import { graphql } from 'react-apollo';
-
-
 const query = gql`
   {
-    people {
-      url
-      homeworld
-      height
-      skin_color
-      birth_year
-      eye_color
-      hair_color
-      gender
-      name
-      mass
-    }
-   }
+		films{
+      title
+		}
+  }
 `;
 
-const PeopleContainer = graphql(query);
+const MovieContainer = graphql(query);
 
-
-import React, { Component } from 'react';
-import './App.css';
-
-function Person({ url, gender, name, homeworld, height, mass, eye_color, hair_color, skin_color }) {
+function Movie({ title }) {
   return (
-    <div style={{ flex: '1 0 300px' }}>
-      <div style={{
-        border: '1px solid rgba(0, 0, 0, 0.12)',
-        padding: '24px'
-      }}>
-        <h1 style={{
-          fontSize: '14px',
-          margin: '8px 0'
-        }}>{name} -  {gender}</h1>
-        <p>
-          Height: {height}, Mass: {mass}, Skin: {skin_color}
-        </p>
-        <p>
-          Eye Color: {eye_color}, Hair: {hair_color}
-        </p>
-        <p>
-          <a href={homeworld}>View Homeworld</a>
-        </p>
-        <p>
-          <a href={url}>View More</a>
-        </p>
-      </div>
-    </div>
+    <option value={title}>{title}</option>
   );
 }
 
-let PeopleList = function PeopleList({ data }) {
+
+let MovieList = function MovieList({ data }) {
+  
+  
   return (
-    <div
-      style={{
-        maxWidth: '680px',
-        margin: '0 auto',
-      }}
-    >
-      <div
-        style={{
-          flexWrap: 'wrap',
-          display: 'flex',
-        }}
-      >
+      <select>
+        <option value="select">SelectX</option>
         {
           data.loading ? (
-            <p>People will be here soon</p>
-
+            <option>Select</option>
           ) : (
-            data.people.map((person, index) => {
-              return <Person key={index} {...person} />
+            data.films.map((title,index)=>{
+              return <Movie key={index} {...title} />
             })
           )
         }
-      </div>
-    </div>
+      </select>
   );
 };
 
-PeopleList = PeopleContainer(PeopleList);
+MovieList = MovieContainer(MovieList);
 
 class App extends Component {
+  constructor(){
+    super();
+    this.state = {value:"Select"};
+  }
+  
   render() {
+    console.log("render",this.state.value);
     return (
       <ApolloProvider client={client}>
         <div className="App">
           <div className="App-header">
-            <img src="https://cdn-images-1.medium.com/fit/t/1600/480/1*sxMljQ8wgso4cG3PxufTmQ.png" className="App-logo"
-                 alt="logo"/>
-            <h2>Your first GraphQL Component</h2>
+            <h2>Star Wars API</h2>
           </div>
-          <PeopleList />
+          <MovieList value={this.state.value}/>
         </div>
       </ApolloProvider>
     );
